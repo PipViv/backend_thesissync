@@ -13,7 +13,7 @@ function sign(payload:any, isAccessToken:boolean){
     //})
     return jwt.sign(payload, isAccessToken ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET, {
         algorithm: "HS256",
-        expiresIn: 7200, 
+        expiresIn: 180, 
     });
     
 }

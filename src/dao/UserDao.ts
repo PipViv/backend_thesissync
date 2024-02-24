@@ -17,11 +17,13 @@ class UserDao {
     }
     async isUsernameAvailable(username: string): Promise<boolean> {
         const { rowCount } = await pool.query('SELECT COUNT(*) as count FROM usuarios WHERE usuario = $1', [username]);
-        return rowCount === 0;
+        console.log(rowCount)
+        return rowCount;
     }
     async isPasswordHashAvailable(passwordHash: string): Promise<boolean> {
+        //console.log("esta es la contrasena => " + passwordHash);
         const { rowCount } = await pool.query('SELECT COUNT(*) as count FROM usuarios WHERE contrasena = $1', [passwordHash]);
-        return rowCount === 0;
+        return rowCount ;
     }
     createAccessToken(usuario: string): string {
         const userInfo = getUserInfo(usuario);

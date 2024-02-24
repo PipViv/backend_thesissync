@@ -82,6 +82,7 @@ const createUserStudent = async (req: Request, res: Response) => {
 const loginUser = async (req: Request, res: Response) => {
     const { usuario, contrasena } = req.body;
     let tmpUser: UserDao = new UserDao();
+    console.log(usuario + "  " + contrasena + " cry " + crypterPass(contrasena));
     
     const userInfo = await tmpUser.infoUser(usuario)
 
@@ -101,10 +102,13 @@ const loginUser = async (req: Request, res: Response) => {
 */
 
     const user = await tmpUser.isUsernameAvailable(usuario);
+    console.log(user);
 
-    if (user == false) {
+    if (user == true) {
+        console.log("usuario correcto")
         const correctPassword = await tmpUser.isPasswordHashAvailable(crypterPass(contrasena));
-        if (correctPassword == false) {
+        if (correctPassword == true) {
+            console.log("passwd correcto!")
             //autenticar el usuario
             const accessToken = tmpUser.createAccessToken(usuario);
             const refreshToken = tmpUser.createRefreshToken(usuario);
@@ -121,6 +125,7 @@ const loginUser = async (req: Request, res: Response) => {
                 }))
 
         } else {
+            console.log("passwd incorrecto")
             return res.status(400).json(
                 jsonResponse(400, {
                     error: "Usuario o Contraseña incorrectos",
@@ -129,6 +134,7 @@ const loginUser = async (req: Request, res: Response) => {
         }
 
     } else {
+        console.log("usuario incorrecto")
         return res.status(400).json(
             jsonResponse(400, {
                 error: "error",
