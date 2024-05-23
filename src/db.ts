@@ -1,20 +1,25 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
-const { db } = require('./config');
+//const { db } = require('./config');
 
-const pool = new Pool({
-    //user: db.user,
-    //password: db.password,
-    //host: db.host,
-    //port: db.port,
-    //database:db.database
+export const pool = new Pool({
     user: "postgres",
     password: "Vivpa16*",
     host: "localhost",
     port: 5432,
-    database: "thesis_sync_dev"
+    database: "tenan_dev1"
+})
 
-
+/*
+const pool = new Pool({
+    user: "postgres",
+    password: "Vivpa16*",
+    host: "localhost",
+    port: 5432,
+    database: "tenan_dev1"
 });
 
-module.exports = pool;
+// Agregar un mensaje de registro para verificar la conexión
+console.log("Conexión a la base de datos establecida correctamente.");
+*/
+//module.exports = pool;

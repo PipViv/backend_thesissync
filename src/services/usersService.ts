@@ -1,11 +1,4 @@
-import { UserData } from '../types.u'
-import usersData from './users.json'
 import * as crypto from 'crypto';
-
-
-const usuariosData: Array<UserData> = usersData as Array<UserData>
-
-export const getEntries = ():UserData[] => usuariosData
 
 export const addEntry = () => null
 

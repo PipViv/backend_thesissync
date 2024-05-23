@@ -9,10 +9,11 @@ export class Theses{
     private fechaEntrega:Date;
     private comentario:string;
     private titulo:string;
+    private extension:string;
 
-    constructor(autor:number, autorA:number,
-        autorB:number,tutor:number, documento:string,
-        fechaEntrega:Date, comentario:string, titulo:string){
+    constructor(autor:number, autorA:any,
+        autorB:any,tutor:any, documento:string,
+        fechaEntrega:Date, comentario:string, titulo:string, extension:string){
 
             this.autor = autor;
             this.autorA = autorA;
@@ -22,6 +23,7 @@ export class Theses{
             this.fechaEntrega = fechaEntrega;
             this.comentario = comentario;
             this.titulo = titulo;
+            this.extension = extension;
     }
 
     public setId(id:number){
@@ -85,6 +87,12 @@ export class Theses{
     }
     public getTitulo():string{
         return this.titulo;
+    }
+    public setExtension(extension:string){
+        this.extension = extension;
+    }
+    public getExtension():string{
+        return this.extension;
     }
 
     public toString(): string {

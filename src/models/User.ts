@@ -1,28 +1,34 @@
 class User {
-    private id: number;
-    private cedula: string;
-    private nombre: string;
-    private apellido: string;
-    private correo: string;
-    private carrera: number;
-    private celular: string;
-    private username: string;
-    private passwd: string;
-    private rol: number;
+    id: number;
+    cedula: string;
+    nombre: string;
+    apellido: string;
+    correo: string;
+    telefono: number;
+    celular: string;
+    //private username: string;
+    passwd: string;
+    correoAlterno: string;
+    direccion: string;
 
-    constructor(id:number,cedula: string, nombre: string, apellido: string, correo: string,
-        carrera: number, celular: string, username: string, passwd: string,
-        rol: number) {
+    constructor(id: number, cedula: string, nombre: string, apellido: string, correo: string,
+        telefono: number,
+        celular: string, //username: string, 
+        passwd: string,
+        correoAlterno: string,
+        direccion: string
+    ) {
         this.id = id
         this.cedula = cedula;
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.carrera = carrera;
+        this.telefono = telefono;
         this.celular = celular;
-        this.username = username;
+        //this.username = username;
         this.passwd = passwd;
-        this.rol = rol;
+        this.correoAlterno = correoAlterno
+        this.direccion = direccion;
 
     }
 
@@ -70,14 +76,21 @@ class User {
     public getCorreo(): string {
         return this.correo;
     }
-
-    // Setter y Getter para 'carrera'
-    public setCarrera(carrera: number): void {
-        this.carrera = carrera;
+    public setDireccion(direccion: string): void {
+        this.correo = direccion;
     }
 
-    public getCarrera(): number {
-        return this.carrera;
+    public getDireccion(): string {
+        return this.direccion;
+    }
+
+    // Setter y Getter para 'carrera'
+    public setTelefono(telefono: number): void {
+        this.telefono = telefono;
+    }
+
+    public getTelefono(): number {
+        return this.telefono;
     }
 
     // Setter y Getter para 'celular'
@@ -90,13 +103,13 @@ class User {
     }
 
     // Setter y Getter para 'username'
-    public setUsername(username: string): void {
+    /*public setUsername(username: string): void {
         this.username = username;
     }
 
     public getUsername(): string {
         return this.username;
-    }
+    }*/
 
     // Setter y Getter para 'passwd'
     public setPasswd(passwd: string): void {
@@ -105,19 +118,6 @@ class User {
 
     public getPasswd(): string {
         return this.passwd;
-    }
-
-    // Setter y Getter para 'rol'
-    public setRol(rol: number): void {
-        this.rol = rol;
-    }
-
-    public getRol(): number {
-        return this.rol;
-    }
-
-    public toString(): string {
-        return `Usuario [id: ${this.id}, cedula: ${this.cedula}, nombre: ${this.nombre}, apellido: ${this.apellido}, correo: ${this.correo}, carrera: ${this.carrera}, celular: ${this.celular}, username: ${this.username}, rol: ${this.rol}]`;
     }
 }
 export default User;
