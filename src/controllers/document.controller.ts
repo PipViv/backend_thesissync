@@ -16,7 +16,7 @@ export const create = async (req: Request, res: Response) => {
   try {
     const { titulo, autorPublic, integranteA, integranteB, tutor, comentario, documento, extension } = req.body;
     const autorPublicId = autorPublic;
-
+    console.log("entra tesis para guardar",req.body)
     // Convertir los valores a enteros o null si están vacíos
     const integranteANum = integranteA === '' ? null : parseInt(integranteA);
     const integranteBNum = integranteB === '' ? null : parseInt(integranteB);

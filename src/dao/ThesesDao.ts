@@ -14,7 +14,7 @@ export class ThesesDao {
 
       if (tesis.getAutorA() === null && tesis.getAutorB() === null) {
         // Si tanto el integrante A como el B son nulos, insertar solo el autor público y el tutor
-        query = `INSERT INTO documents (user_id_public, user_id_tutor, comentario, document, title, fecha_creacion, extension) VALUES ($1, $2, $3, $4, $5, $6, $7);`;
+        query = `INSERT INTO documents (user_id_public, user_id_tutor, comentario, document, title, fecha_creacion, extension) VALUES ($1, (SELECT id FROM users WHERE cedula = $2), $3, $4, $5, $6, $7);`;
         values = [
           tesis.getAutor(),
           tesis.getTutor(),
@@ -128,6 +128,7 @@ export class ThesesDao {
                         d.user_id_public = $1
                         OR d.user_id_a = $1
                         OR d.user_id_b = $1
+                        OR d.user_id_tutor = $1
                         OR j.jurado = $1
                     `; // Pega la consulta de arriba aquí
     
