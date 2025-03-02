@@ -281,21 +281,50 @@ class UserDao {
     }
   }
 
+  // async insertCarrier(cedula: string, carrera: number): Promise<boolean> {
+  //   try {
+  //     const query = "INSERT INTO users_programs (student, programd) VALUES((SELECT id FROM users WHERE cedula = $1 LIMIT 1), (SELECT id FROM programs WHERE id = $2 LIMIT 1));";
+  //     const values = [cedula, carrera];
+  //     await pool.query(query, values);
+  //     return true; // Indica éxito
+  //   } catch (error) {
+  //     console.error('Error inserting user carrier:', error);
+  //     return false; // Indica fallo
+  //   }
+  // }
+
   async insertCarrier(cedula: string, carrera: number): Promise<boolean> {
     try {
-      const query = "INSERT INTO users_programs (student, programd) VALUES((SELECT id FROM users WHERE cedula = $1), (SELECT id FROM programs WHERE id = $2));";
-      const values = [cedula, carrera];
-      await pool.query(query, values);
-      return true; // Indica éxito
-    } catch (error) {
-      console.error('Error inserting user carrier:', error);
-      return false; // Indica fallo
-    }
-  }
+      console.log('Ejecutando query:', cedula,carrera);
 
-  async insertFaculty(cedula: string, facultad: number): Promise<boolean> {
+        const query = `
+            INSERT INTO users_programs (student, programd)
+            VALUES (
+                (SELECT id FROM users WHERE cedula = $1 LIMIT 1), 
+                (SELECT id FROM programs WHERE id = $2 LIMIT 1)
+            )
+            RETURNING *;
+        `;
+        const values = [cedula, carrera];
+        const result = await pool.query(query, values);
+        console.log('Ejecutando query:', query, values);
+        if (result.rowCount > 0) {
+            return true; // Indica éxito
+        } else {
+            console.error("No se insertó el usuario en users_programs");
+            return false;
+        }
+    } catch (error) {
+        console.error('Error inserting user carrier:', error);
+        return false; // Indica fallo
+    }
+}
+
+
+  async insertFaculty(cedula: string, facultad: number ): Promise<boolean> {
     try {
-      const query = 'INSERT INTO users_faculty (teacher, faculty) VALUES ((SELECT id FROM users WHERE cedula = $1), $2)';
+     
+      const query = ' INSERT INTO users_faculty (teacher, faculty) VALUES ((SELECT id FROM users WHERE cedula = $1 LIMIT 1), (SELECT faculty FROM program_faculty WHERE programs = $2 LIMIT 1))';
       const values = [cedula, facultad];
       await pool.query(query, values);
       return true; // Indica éxito
@@ -304,6 +333,24 @@ class UserDao {
       return false; // Indica fallo
     }
   }
+
+  async getFacultyByProgram(programaId: number): Promise<number | null> {
+    try {
+        const query = "SELECT faculty_id FROM program_faculty WHERE program_id = $1 LIMIT 1";
+        const values = [programaId];
+        const result = await pool.query(query, values);
+
+        if (result.rows.length > 0) {
+            return result.rows[0].faculty_id;
+        } else {
+            return null; // No se encontró facultad
+        }
+    } catch (error) {
+        console.error("Error fetching faculty_id:", error);
+        return null;
+    }
+}
+
 
   async insertTeacher(cedula: string): Promise<boolean> {
     try {

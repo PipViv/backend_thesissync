@@ -69,6 +69,19 @@ export const createPeriod = async (req: Request, res: Response): Promise<any> =>
   }
 }
 
+export const listPrograms = async(_req: Request, res: Response): Promise<any> =>{
+  try {
+    const carrier: CarrierDAO = new CarrierDAO();
+    const programs = await carrier.getAllCarriersList();
+    console.log(programs)
+    // const programs = await programRepository.find();
+
+    return res.status(200).json(programs);
+  } catch (error) {
+    console.error('Error list programs:', error);
+    res.status(500).send('Internal server error');
+  }
+}
 
 export const updatePeriod = async (req: Request, res: Response): Promise<any> => {
   try {

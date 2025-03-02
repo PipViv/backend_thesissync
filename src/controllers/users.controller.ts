@@ -107,13 +107,14 @@ const create = async (req: Request, res: Response) => {
         insertRol = await tmpUser.insertRol(cedula, rol);
         }   
         let insertCarrier = null;
-        if(rol ===1 ){
-        insertCarrier = tmpUser.insertCarrier(cedula,carrera)
-        console.log(insert,insertRol,insertCarrier)
+        if(rol == 3 ){
+            insertCarrier = tmpUser.insertCarrier(cedula,carrera)
+            console.log(insert,insertRol,insertCarrier)
         } else{
-            const insertFaculty = await tmpUser.insertFaculty(cedula, 1);
+            // const facultyId:number | null = await tmpUser.getFacultyByProgram(carrera);
+            const insertFaculty = await tmpUser.insertFaculty(cedula, carrera);
             const inserDocente = await tmpUser.insertTeacher(cedula)
-            console.log("es docente", insertFaculty, inserDocente)
+            console.log(" ", insertFaculty, inserDocente)
         }
         
         res.status(200).json(jsonResponse(200, { message: "Usuario Creado con Exito" }))
