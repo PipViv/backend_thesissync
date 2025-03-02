@@ -70,6 +70,7 @@ class UserDao {
 
   async getCompanion(id: number) {
     try {
+      console.log("consultando a ",id)
       const sql = 'SELECT id, cedula, nombre, apellido FROM users WHERE id = $1';
       const value = [id];
       const result: QueryResult = await pool.query(sql, value);

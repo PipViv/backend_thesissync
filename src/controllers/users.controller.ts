@@ -8,39 +8,9 @@ import { getTokenFromHeader } from '../auth/getTokenFromHeader';
 import { verifyAccessToken, verifyRefreshToken } from '../auth/verify';
 import { generateAccessToken } from '../auth/generateToken';
 
-/*
-const refreshToken = async (req: Request, res: Response) => {
-    const refreshToken = getTokenFromHeader(req.headers);
 
-    let tmpUser: UserDao = new UserDao();
-
-    if (refreshToken) {
-
-        const found = await tmpUser.findRefreshTokenByUser(refreshToken);
-
-        try {
-            if (!found) {
-                return res.status(401).send(jsonResponse(401, { error: "Unauthorized" }))
-            }
-            const payload = verifyRefreshToken(found)
-            if (payload) {
-                const accessToken = generateAccessToken(payload)
-                return res.status(200).json(jsonResponse(299, { accessToken }))
-            } else {
-                return res.status(401).send(jsonResponse(401, { error: "Unauthorized" }))
-            }
-        } catch (error) {
-            return res.status(401).send(jsonResponse(401, { error: "Unauthorized" }))
-        }
-    } else {
-        res.status(401).send(jsonResponse(401, { error: "Unauthorized" }));
-    }
-}
-
-*/
 const refreshToken = async (req: Request, res: Response) => {
     try {
-        console.log("Token del encabezado:", req.headers);
 
         const refreshToken = getTokenFromHeader(req.headers);
 

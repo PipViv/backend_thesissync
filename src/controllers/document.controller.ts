@@ -4,6 +4,14 @@ import { ThesesDao } from '../dao/ThesesDao';
 import moment from 'moment-timezone'; // Importa la biblioteca moment-timezone para manejar la zona horaria
 import MessageDoc from '../models/MessageDoc';
 
+// interface EvaluationCriterion {
+//   aspect: string;
+//   weight: number;
+//   score: number;
+//   weightedScore: number;
+//   observations: string;
+// }
+
 export const create = async (req: Request, res: Response) => {
   try {
     const { titulo, autorPublic, integranteA, integranteB, tutor, comentario, documento, extension } = req.body;
@@ -87,21 +95,38 @@ export const downloadDoc = async (req: Request, res: Response) => {
 
 
 //RETROALIMENTACIONES
+// export const messagesDoc = async (req: Request, res: Response) => {
+//   const { autor, message, doc } = req.body;
+
+//   try {
+//     const chatDoc: MessageDoc = new MessageDoc(0, autor, message, doc)
+//     const tesisDao: ThesesDao = new ThesesDao();
+//     const thesisChat = await tesisDao.saveMessageForDoc(chatDoc);
+//     console.log(thesisChat)
+//     res.status(200).json({ message: 'Guardado con exito' });
+//   } catch (error) {
+//     console.error('Error al descargar la tesis:', error);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+
+//   }
+// }
 export const messagesDoc = async (req: Request, res: Response) => {
-  const { authorMessageId, message, doc } = req.body;
+  const { autor, message, doc, fecha_envio } = req.body;
 
   try {
-    const chatDoc: MessageDoc = new MessageDoc(0, authorMessageId, message, doc)
-    const tesisDao: ThesesDao = new ThesesDao();
-    const thesisChat = await tesisDao.saveMessageForDoc(chatDoc);
-    console.log(thesisChat)
-    res.status(200).json({ message: 'Guardado con exito' });
-  } catch (error) {
-    console.error('Error al descargar la tesis:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+      const chatDoc: MessageDoc = new MessageDoc(0, autor, message, doc);
+      const tesisDao: ThesesDao = new ThesesDao();
+      const thesisChat = await tesisDao.saveMessageForDoc(chatDoc, fecha_envio);
 
+      console.log("Mensaje guardado en la BD:", thesisChat);
+
+      res.status(200).json({ message: 'Guardado con éxito', data: thesisChat });
+  } catch (error) {
+      console.error('Error al guardar el mensaje:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
+};
+
 
 export const showChat = async (req: Request, res: Response) => {
   const thesisId: number = Number(req.params.id);
@@ -136,52 +161,146 @@ export const asignarJurado = async (req: Request, res: Response) => {
   }
 }
 
+// export const evaluarTesis = async (req: Request, res: Response) => {
+//   try {
+//     // Obtener los datos del cuerpo de la solicitud
+//     const { thesisId, evaluationFile, evaluationData } = req.body;
+
+//     // Hacer lo que necesites con los datos
+//     console.log('ID de tesis:', thesisId);
+//     console.log('Archivo de evaluación:', evaluationFile);
+//     console.log('Datos de evaluación:', evaluationData);
+
+//     const investigacion = evaluationData.investigacion;
+//     const ortografia = evaluationData.ortografia;
+//     const bibliografia = evaluationData.bibliografia;
+//     const final = evaluationData.final;
+//     const tesisDao: ThesesDao = new ThesesDao();
+//     await tesisDao.evaluartesis(investigacion, ortografia, bibliografia, final, thesisId);
+//     // Responder con un mensaje de éxito
+//     return res.status(200).json({ message: 'Datos recibidos correctamente' });
+
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+//   }
+// }
+// export const evaluarTesis = async (req: Request, res: Response) => {
+//   try {
+//     const { thesisId, evaluationData } = req.body;
+
+//     // Validación de datos recibidos
+//     if (!thesisId || !evaluationData || typeof evaluationData !== 'object') {
+//       return res.status(400).json({ error: 'Datos de evaluación inválidos' });
+//     }
+
+//     console.log('ID de tesis:', thesisId);
+//     console.log('Datos de evaluación:', evaluationData);
+
+//     // Convertir evaluación en un array de criterios con pesos y observaciones
+//     const criteria = Object.entries(evaluationData).map(([aspect, data]: [string, any]) => {
+//       return {
+//         aspect,
+//         weight: data.weight || 0,  // Se espera un peso (ej. 0.05 para 5%)
+//         score: data.score || 0,    // Calificación del criterio (ej. 4.5)
+//         observations: data.observations || '', // Observaciones opcionales
+//       };
+//     });
+
+//     // Guardar en la base de datos
+//     const tesisDao = new ThesesDao();
+//     await tesisDao.evaluarTesis(thesisId, criteria);
+
+//     return res.status(200).json({ message: 'Evaluación guardada correctamente' });
+
+//   } catch (error) {
+//     console.error('Error al evaluar tesis:', error);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+//   }
+// };
 export const evaluarTesis = async (req: Request, res: Response) => {
   try {
-    // Obtener los datos del cuerpo de la solicitud
     const { thesisId, evaluationFile, evaluationData } = req.body;
 
-    // Hacer lo que necesites con los datos
-    console.log('ID de tesis:', thesisId);
-    console.log('Archivo de evaluación:', evaluationFile);
-    console.log('Datos de evaluación:', evaluationData);
+    if (!thesisId || !evaluationData || !evaluationData.evaluation) {
+      return res.status(400).json({ error: 'Datos incompletos' });
+    }
 
-    const investigacion = evaluationData.investigacion;
-    const ortografia = evaluationData.ortografia;
-    const bibliografia = evaluationData.bibliografia;
-    const final = evaluationData.final;
+    const { title, evaluator, email, evaluation, finalScore } = evaluationData;
+    console.log(title, evaluationFile)
+    // Guardar evaluación principal
     const tesisDao: ThesesDao = new ThesesDao();
-    await tesisDao.evaluartesis(investigacion, ortografia, bibliografia, final, thesisId);
-    // Responder con un mensaje de éxito
-    return res.status(200).json({ message: 'Datos recibidos correctamente' });
+    const evaluationId = await tesisDao.guardarEvaluacion(
+      thesisId, evaluator, email, finalScore
+    );
+
+    // Guardar cada criterio de evaluación en la tabla de detalles
+    for (const criterion of evaluation) {
+      await tesisDao.guardarDetalleEvaluacion(
+        evaluationId,
+        criterion.aspect,
+        criterion.weight,
+        criterion.score,
+        criterion.weightedScore,
+        criterion.observations
+      );
+    }
+
+    return res.status(200).json({ message: 'Evaluación guardada correctamente' });
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error en evaluarTesis:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
+};
+
+
+
+// export const showEvaluacionTesis = async (req: Request, res: Response) => {
+//   try {
+//     const idParam: string | undefined = req.params.id;
+//     if (idParam === undefined) {
+//       return res.status(400).json({ error: "El parámetro 'id' es obligatorio" });
+//     }
+//     // Verificar si idParam es un número
+//     if (!isNaN(Number(idParam))) {
+//       const id: number = parseInt(idParam, 10);
+//       const tesisDao: ThesesDao = new ThesesDao();
+//       const result = await tesisDao.searchEvaluacion(id);
+//       //console.log(result)
+//       return res.status(200).json(result);
+//     } else {
+//       return res.status(400).json({ error: "El parámetro 'id' debe ser un número" });
+//     }
+
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+//   }
+// }
 export const showEvaluacionTesis = async (req: Request, res: Response) => {
   try {
-    const idParam: string | undefined = req.params.id;
-    if (idParam === undefined) {
-      return res.status(400).json({ error: "El parámetro 'id' es obligatorio" });
-    }
-    // Verificar si idParam es un número
-    if (!isNaN(Number(idParam))) {
+      const idParam: string | undefined = req.params.id;
+
+      if (!idParam || isNaN(Number(idParam))) {
+          return res.status(400).json({ error: "El parámetro 'id' es obligatorio y debe ser un número válido" });
+      }
+
       const id: number = parseInt(idParam, 10);
       const tesisDao: ThesesDao = new ThesesDao();
-      const result = await tesisDao.searchEvaluacion(id);
-      //console.log(result)
-      return res.status(200).json(result);
-    } else {
-      return res.status(400).json({ error: "El parámetro 'id' debe ser un número" });
-    }
+      const evaluacion = await tesisDao.searchEvaluacion(id);
 
+      if (!evaluacion) {
+          return res.status(404).json({ message: "No se encontró evaluación para esta tesis" });
+      }
+      console.log("esto le retorno", evaluacion)
+      return res.status(200).json(evaluacion);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+      console.error('Error al obtener la evaluación de la tesis:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
+};
+
 
 
 

@@ -2,18 +2,18 @@ export default class MessageDoc {
     private id: number;
     private autor: number;
     private message: string;
-    private document: number;
+    private doc: number;
 
     constructor(
         id: number,
         autor: number,
         message: string,
-        document: number) {
+        doc: number) {
 
         this.id = id;
         this.autor = autor;
         this.message = message;
-        this.document = document;
+        this.doc = doc;
     }
     public setId(id: number) {
         this.id = id;
@@ -34,9 +34,9 @@ export default class MessageDoc {
         return this.message;
     }
     public setDocument(document: number) {
-        this.document = document;
+        this.doc = document;
     }
     public getDocument(): number {
-        return this.document;
+        return this.doc;
     }
 }
