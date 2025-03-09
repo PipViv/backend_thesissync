@@ -4,6 +4,11 @@ import { ThesesDao } from '../dao/ThesesDao';
 import moment from 'moment-timezone'; // Importa la biblioteca moment-timezone para manejar la zona horaria
 import MessageDoc from '../models/MessageDoc';
 
+import nodemailer from 'nodemailer';
+// import twilio from 'twilio';
+import dotenv from 'dotenv';
+
+dotenv.config();
 // interface EvaluationCriterion {
 //   aspect: string;
 //   weight: number;
@@ -11,6 +16,14 @@ import MessageDoc from '../models/MessageDoc';
 //   weightedScore: number;
 //   observations: string;
 // }
+// Configurar nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -218,6 +231,48 @@ export const asignarJurado = async (req: Request, res: Response) => {
 //     res.status(500).json({ error: 'Error interno del servidor' });
 //   }
 // };
+// export const evaluarTesis = async (req: Request, res: Response) => {
+//   try {
+//     const { thesisId, evaluationFile, evaluationData } = req.body;
+
+//     if (!thesisId || !evaluationData || !evaluationData.evaluation) {
+//       return res.status(400).json({ error: 'Datos incompletos' });
+//     }
+
+//     const { title, evaluator, email, evaluation, finalScore } = evaluationData;
+//     console.log(title, evaluationFile)
+//     // Guardar evaluación principal
+//     const tesisDao: ThesesDao = new ThesesDao();
+//     const evaluationId = await tesisDao.guardarEvaluacion(
+//       thesisId, evaluator, email, finalScore
+//     );
+
+//     // Guardar cada criterio de evaluación en la tabla de detalles
+//     for (const criterion of evaluation) {
+//       await tesisDao.guardarDetalleEvaluacion(
+//         evaluationId,
+//         criterion.aspect,
+//         criterion.weight,
+//         criterion.score,
+//         criterion.weightedScore,
+//         criterion.observations
+//       );
+//     }
+
+//     return res.status(200).json({ message: 'Evaluación guardada correctamente' });
+
+//   } catch (error) {
+//     console.error('Error en evaluarTesis:', error);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+//   }
+// };
+
+
+
+
+// Configurar Twilio
+// const twilioClient = twilio("", "");
+
 export const evaluarTesis = async (req: Request, res: Response) => {
   try {
     const { thesisId, evaluationFile, evaluationData } = req.body;
@@ -227,14 +282,13 @@ export const evaluarTesis = async (req: Request, res: Response) => {
     }
 
     const { title, evaluator, email, evaluation, finalScore } = evaluationData;
-    console.log(title, evaluationFile)
-    // Guardar evaluación principal
-    const tesisDao: ThesesDao = new ThesesDao();
-    const evaluationId = await tesisDao.guardarEvaluacion(
-      thesisId, evaluator, email, finalScore
-    );
 
-    // Guardar cada criterio de evaluación en la tabla de detalles
+    console.log(title, evaluationFile);
+
+    // Guardar evaluación en la base de datos
+    const tesisDao: ThesesDao = new ThesesDao();
+    const evaluationId = await tesisDao.guardarEvaluacion(thesisId, evaluator, email, finalScore);
+
     for (const criterion of evaluation) {
       await tesisDao.guardarDetalleEvaluacion(
         evaluationId,
@@ -246,7 +300,31 @@ export const evaluarTesis = async (req: Request, res: Response) => {
       );
     }
 
-    return res.status(200).json({ message: 'Evaluación guardada correctamente' });
+    // 🔹 Enviar correo electrónico
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Evaluación de Tesis',
+      text: `Hola ${evaluator},\n\nTu evaluación de la tesis "${title}" ha sido registrada con éxito.\nPuntaje final: ${finalScore}\n\nGracias.`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error al enviar el correo:', error);
+      } else {
+        console.log('Correo enviado: ' + info.response);
+      }
+    });
+    // const recipientPhone = process.env.RECIPIENT_PHONE_NUMBER ?? "";
+
+    // 🔹 Enviar SMS con Twilio
+    // await twilioClient.messages.create({
+    //   body: `Tu evaluación de la tesis "${title}" ha sido registrada con éxito. Puntaje final: ${finalScore}`,
+    //   from:  '',
+    //   to: recipientPhone,
+    // });
+
+    return res.status(200).json({ message: 'Evaluación guardada y notificaciones enviadas' });
 
   } catch (error) {
     console.error('Error en evaluarTesis:', error);
